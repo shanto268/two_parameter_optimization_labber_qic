@@ -7,8 +7,9 @@ This code allows one to do optimized parameter sweeps for Quantum Computing/Info
 
 ```mermaid
 graph LR
-  A[Input Parameter 1] ----> B(fa:fa-python MeasurementOptimizer);
-  C[Input Parameter 2] ----> B(fa:fa-python MeasurementOptimizer);
+  B("fa:fa-python MeasurementOptimizer");
+  A[Input Parameter 1] ----> B;
+  C[Input Parameter 2] ----> B;
   D[Optimization Parameter] --> E{Is the Optimization Parameter a Derived Quantity};
   E -->|Yes| F[Case 1];
   E -->|No| G[Case 2];
