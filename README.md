@@ -4,8 +4,19 @@ This code allows one to do optimized parameter sweeps for Quantum Computing/Info
 
 
 ## Use Cases:
-    1. The parameter to optimize over is a measurement from the system
-    2. The parameter to optimize over is a derived quantity such as `SNR`
+
+```mermaid
+graph LR
+  A[Input Parameter 1] ----> B(MeasurementOptimizer);
+  C[Input Parameter 2] ----> B(MeasurementOptimizer);
+  D[Optimization Parameter] --> E{Is the Optimization Parameter a Derived Quantity};
+  E -->|Yes| F[Case 1];
+  E -->|No| G[Case 2];
+  F --> B;
+  G --> B;
+```
+
+
 
 ## Usage
 
