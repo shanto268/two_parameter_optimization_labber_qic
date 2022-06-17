@@ -2,7 +2,6 @@
 
 This code allows one to do optimized parameter sweeps for Quantum Computing/Information experiments using systems integrated through Labber API
 
-## Goal:
 
 ## Use Cases:
     1. The parameter to optimize over is a measurement from the system
