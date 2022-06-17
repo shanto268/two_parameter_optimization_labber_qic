@@ -27,14 +27,14 @@ MeasurementOptimizer()
 
 
 ### To Do:
-    -[ ] study James' code
-        -[ ] methods to deal with generalized output optimization
-        -[ ] obj code verification
-        -[ ] save data
-        -[ ] implement SNR optimization
-    -[ ] test
-        -[ ] toy
-        -[ ] with system
-    -[ ] document
-    -[ ] 3 param  opt.
+    - [ ] study James' code
+        - [ ] methods to deal with generalized output optimization
+        - [ ] obj code verification
+        - [ ] save data
+        - [ ] implement SNR optimization
+    - [ ] test
+        - [ ] toy
+        - [ ] with system
+    - [ ] document
+    - [ ] 3 param  opt.
 
