@@ -3,46 +3,24 @@
 =========================================================
 Program : Measurements/two_parameter_optimization.py
 =========================================================
-
-To Do:
-    - document
-    - test
-    - obj code verification
-    - save data
-    - 3 param  opt.
-
-Test:
-    - data from old files and run routine with wait time
-    - test run for comms with Labber
-    - small test run using system
-
-
-Summary:
 """
+
 __author__ =  "Sadman Ahmed Shanto"
 __date__ = "06/14/2022"
 __email__ = "shanto@usc.edu"
 
 import numpy as np
 import os, sys
+import json
 from scipy.optimize import *
+from CallBackOptions import *
 
-class TookTooLong(Warning):
-    pass
-
-class MinimizeStopper(object):
-    def __init__(self, max_sec=60):
-        self.max_sec = max_sec
-        self.start = time.time()
-    def __call__(self, xk=None):
-        elapsed = time.time() - self.start
-        if elapsed > self.max_sec:
-            warnings.warn("Terminating optimization: time limit reached",
-                          TookTooLong)
-        else:
-            # you might want to report other stuff here
-            print("Elapsed: %.3f sec" % elapsed)
-
+def is_json(myjson):
+  try:
+    json.loads(myjson)
+  except ValueError as e:
+    return False
+  return True
 
 class MeasurementOptimizer:
 
@@ -54,7 +32,7 @@ class MeasurementOptimizer:
         :paramater2: tuple: (name, interface, address, parameter string) e.g. ('Keithley 2400 SourceMeter','GPIB','23', 'Source Current')
         :constraints1: tuple: (min,max)
         :constraints2: tuple: (min,max)
-        :objective_function: tuple: (name, interface, address, parameter string) e.g. ('Keithley 2400 SourceMeter','GPIB','23', 'Source Current)
+        :objective_function: tuple if measurement output or json file if calculated value: (name, interface, address, parameter string) e.g. ('Keithley 2400 SourceMeter','GPIB','23', 'Source Current)
         :init_guess: tuple of best starting value for both parameters: (value_param1, value_param2)
         :max_time: float value representing number of seconds
         :op_algo: string of optimization algorithm: e.g. "Newton-CG"
@@ -70,15 +48,37 @@ class MeasurementOptimizer:
         self._max_time = max_time
         self.op_algo = op_algo
 
+    def validate_objective_function_target(self, client):
+        # check whether obj func is a measurement output or a calculated value
+        isJSON = is_json(self._objective_function)
+        if isJSON:
+            pass
+        else if isinstance(self._objective_function, tuple):
+            objl = client.connectToInstrument(self._objective_function[0], dict(interface=self._objective_function[1], address=self._objective_function[2]))
+            objl.startInstrument()
+            return objl
+
+
 
     def start_labber_connections(self):
+        """
+        [TODO:summary]
+
+        [TODO:description]
+        """
         client = Labber.connectToServer()
 
+        # input parameters
         labber_param1 = client.connectToInstrument(self._labber_paramater1[0], dict(interface=self._labber_paramater1[1], address=self._labber_parameter1[2]))
         labber_param2 = client.connectToInstrument(self._labber_paramater2[0], dict(interface=self._labber_paramater2[1], address=self._labber_parameter2[2]))
 
         labber_param1.startInstrument()
         labber_param2.startInstrument()
+
+
+        # set up obj function labber drive
+        objl = client.connectToInstrument(self._objective_function[0], dict(interface=self._objective_function[1], address=self._objective_function[2]))
+        objl.startInstrument()
 
         return labber_param1, labber_param2
 
@@ -123,7 +123,15 @@ class MeasurementOptimizer:
 
 
 
-    def start_optimization_routine(p1l,p2l):
+    def start_optimization_routine(self, p1l,p2l):
+        """[TODO:summary]
+
+        [TODO:description]
+
+        Args:
+            p1l: [TODO:description]
+            p2l: [TODO:description]
+        """
         global p1l, p2l, objl
         # define starting point
         if init_guess != None:
@@ -139,10 +147,6 @@ class MeasurementOptimizer:
         # we can add max iterations as well
         # optns={'disp': True, 'maxiter':max_iters}
 
-        # set up obj function labber drive
-        objl = Labber.connectToServer()
-        objl = client.connectToInstrument(self._objective_function[0], dict(interface=self._objective_function[1], address=self._objective_function[2]))
-        objl.startInstrument()
 
         optimum_params = minimize(self.max_objective_function, (p1_guess, p2_guess), method = self.op_algo, bounds = bnds, options = optns, callback=MinimizeStopper(1E-3))
 
